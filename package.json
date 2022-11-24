@@ -2,5 +2,8 @@
   "devDependencies": {
     "prettier": "^2.8.0",
     "serve": "^14.1.2"
+  },
+  "scripts": {
+    "format": "prettier -w dist/index.html dist/main.js"
   }
 }
