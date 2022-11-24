@@ -3553,6 +3553,7 @@ var ASM_CONSTS = {
       return ret;
     }
 
+
   var FSNode = /** @constructor */ function(parent, name, mode, rdev) {
     if (!parent) {
       parent = this;  // root node sets parent to itself
@@ -3656,7 +3657,7 @@ var dynCall_jiji = Module["dynCall_jiji"] = function() {
 
 // === Auto-generated postamble setup entry stuff ===
 
-
+Module["FS"] = FS;
 
 
 var calledRun;

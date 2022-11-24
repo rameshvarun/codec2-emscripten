@@ -1,5 +1,5 @@
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 4c7cabc3..6eec5750 100644
+index 4c7cabc3..be7aae4f 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -2,148 +2,6 @@
@@ -156,7 +156,7 @@ index 4c7cabc3..6eec5750 100644
      PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/codec2 COMPONENT dev
  )
 +
-+set(EMSCRIPTEN_OPTS "-s 'STRICT=1' -s 'ALLOW_MEMORY_GROWTH=1' -s 'WASM=1' -s 'MODULARIZE=1'")
++set(EMSCRIPTEN_OPTS "-s 'STRICT=1' -s 'ALLOW_MEMORY_GROWTH=1' -s 'WASM=1' -s 'MODULARIZE=1' -s 'EXTRA_EXPORTED_RUNTIME_METHODS=[FS]'")
 +set_target_properties(c2enc PROPERTIES LINK_FLAGS "${EMSCRIPTEN_OPTS} -s 'EXPORT_NAME=createC2Enc'")
 +set_target_properties(c2dec PROPERTIES LINK_FLAGS "${EMSCRIPTEN_OPTS} -s 'EXPORT_NAME=createC2Dec'")
 \ No newline at end of file
