@@ -14,6 +14,24 @@ function arrayBufferToHex(buffer) {
     .join("");
 }
 
+function arrayBufferToBase64(buffer) {
+  let binary = "";
+  let bytes = new Uint8Array(buffer);
+  for (let byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+  return window.btoa(binary);
+}
+
+function base64ToArrayBuffer(base64) {
+  let binary = window.atob(base64);
+  let bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
 function runDecode(mode, data) {
   return new Promise((resolve, reject) => {
     const module = {
@@ -111,52 +129,44 @@ function audioFileToRaw(buffer, filename) {
 }
 
 const DEFAULT_VALUE =
-  "74e98150e1854230e1c081f07214012072094160e1c541f04629ed4051fb" +
-  "f110c160a930c149e950043f7d90c58f7db04e5ebda07e23397044c658b0" +
-  "2b8a60c02dce60d04072d8c018bf28f09092f100b1a4801037ea008084bb" +
-  "dc007890a010a302bd80161b7540705e841090568400597f8110a6ad14a0" +
-  "e1b04000e1c741104629e9304650a510c3da80c03a4cc0d02bd4f5402db3" +
-  "ad306dae8540fca8410001b940d0cdf7d800d9082000b9e57160255abd50" +
-  "2f197d30843ef9101ff7e000dd85a4005f1f0000c8de88609a82c000dc86" +
-  "00007b2318a08c555ce08c0dd4908c0dd0406badd010785d8c005f291000" +
-  "bb49dc00bb5e18004875c000abf90120e1ff812093f60210723f4190e1c3" +
-  "8000e1b0c170e1f102d0fad74120721a8170eea9c240abb78180e1ff8310";
+  "dOmBUOGFQjDhwIHwchQBIHIJQWDhxUHwRintQFH78RDBYKkwwUnpUAQ/fZDFj32wTl69oH4jOXBExliwK4pgwC3OYNBActjAGL8o8JCS8QCxpIAQN+oAgIS73AB4kKAQowK9gBYbdUBwXoQQkFaEAFl/gRCmrRSg4bBAAOHHQRBGKekwRlClEMPagMA6TMDQK9T1QC2zrTBtroVA/KhBAAG5QNDN99gA2QggALnlcWAlWr1QLxl9MIQ++RAf9+AA3YWkAF8fAADI3ohgmoLAANyGAAB7IxigjFVc4IwN1JCMDdBAa63QEHhdjABfKRAAu0ncALteGABIdcAAq/kBIOH/gSCT9gIQcj9BkOHDgADhsMFw4fEC0PrXQSByGoFw7qnCQKu3gYDh/4MQ";
+
+function ModeSelector(props) {
+  return html`<div style=${{ marginTop: "20px" }} className="form-group row">
+    <label htmlFor="decode-mode-select" className="col-sm-3 col-form-label"
+      >Codec Mode</label
+    >
+    <div className="col-sm-9">
+      <select defaultValue="700C" id=${props.selectId} className="form-control">
+        <option value="3200">3200</option>
+        <option value="2400">2400</option>
+        <option value="1600">1600</option>
+        <option value="1400">1400</option>
+        <option value="1300">1300</option>
+        <option value="1200">1200</option>
+        <option value="700C">700C</option>
+        <option value="450">450</option>
+        <option value="450PWB">450PWB</option>
+      </select>
+    </div>
+  </div>`;
+}
 
 class Decoder extends React.Component {
   render() {
     return html`<div>
       <div className="form-group">
-        <label htmlFor="decode-hex-input">Hex Input</label>
+        <label htmlFor="decode-input">Base64 Input</label>
         <textarea
           className="form-control"
           style=${{ width: "100%", height: "300px" }}
           defaultValue=${DEFAULT_VALUE}
-          id="decode-hex-input"
+          id="decode-input"
         >
         </textarea>
       </div>
-      <div style=${{ marginTop: "20px" }} className="form-group row">
-        <label htmlFor="decode-mode-select" className="col-sm-3 col-form-label"
-          >Codec Mode</label
-        >
-        <div className="col-sm-9">
-          <select
-            defaultValue="700C"
-            id="decode-mode-select"
-            className="form-control"
-          >
-            <option value="3200">3200</option>
-            <option value="2400">2400</option>
-            <option value="1600">1600</option>
-            <option value="1400">1400</option>
-            <option value="1300">1300</option>
-            <option value="1200">1200</option>
-            <option value="700C">700C</option>
-            <option value="450">450</option>
-            <option value="450PWB">450PWB</option>
-          </select>
-        </div>
-      </div>
+
+      <${ModeSelector} selectId="decode-mode-select" />
 
       <div
         style=${{
@@ -182,15 +192,16 @@ class Decoder extends React.Component {
   }
 
   async decode() {
-    const hex = document.getElementById("decode-hex-input").value;
-    const buffer = hexToArrayBuffer(hex);
     const mode = document.getElementById("decode-mode-select").value;
 
-    let decodedRaw = await runDecode(mode, buffer);
-    let wavBuffer = await rawToWav(decodedRaw);
+    const input = document.getElementById("decode-input").value;
+    const encoded = base64ToArrayBuffer(input);
+
+    let decodedRaw = await runDecode(mode, encoded);
+    let decodedWav = await rawToWav(decodedRaw);
 
     document.getElementById("decode-playback").src = URL.createObjectURL(
-      new Blob([wavBuffer], { type: "audio/wav" })
+      new Blob([decodedWav], { type: "audio/wav" })
     );
   }
 }
@@ -208,25 +219,49 @@ function readFileAsArrayBuffer(file) {
 class Encoder extends React.Component {
   render() {
     return html`<div>
-      <div><input id="enc-upload" type="file" /></div>
-      <select defaultValue="700C" id="encode-mode-select">
-        <option value="3200">3200</option>
-        <option value="2400">2400</option>
-        <option value="1600">1600</option>
-        <option value="1400">1400</option>
-        <option value="1300">1300</option>
-        <option value="1200">1200</option>
-        <option value="700C">700C</option>
-        <option value="450">450</option>
-        <option value="450PWB">450PWB</option>
-      </select>
+      <div className="form-group row">
+        <div className="col-sm-4">
+          <label htmlFor="enc-upload">.WAV File Upload</label>
+        </div>
+        <div className="col-sm-8">
+          <input
+            id="enc-upload"
+            className="form-control-file"
+            type="file"
+            accept="audio/wav"
+          />
+        </div>
+      </div>
 
-      <div><button onClick=${() => this.encode()}>Encode</button></div>
-      <textarea
-        style=${{ width: "100%", height: "300px" }}
-        id="encode-hex-output"
+      <${ModeSelector} selectId="encode-mode-select" />
+
+      <div
+        style=${{
+          marginTop: "20px",
+          marginBottom: "20px",
+          display: "flex",
+          justifyContent: "right",
+        }}
       >
-      </textarea>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          onClick=${() => this.encode()}
+        >
+          Encode
+        </button>
+      </div>
+
+      <hr />
+
+      <div className="form-group">
+        <textarea
+          className="form-control"
+          style=${{ width: "100%", height: "300px", marginTop: "20px" }}
+          id="encode-output"
+        >
+        </textarea>
+      </div>
     </div>`;
   }
 
@@ -238,8 +273,8 @@ class Encoder extends React.Component {
     let rawBuffer = await audioFileToRaw(buffer, file.name || "input.wav");
     let encoded = await runEncode(mode, rawBuffer);
 
-    document.getElementById("encode-hex-output").innerHTML =
-      arrayBufferToHex(encoded);
+    document.getElementById("encode-output").innerHTML =
+      arrayBufferToBase64(encoded);
   }
 }
 
