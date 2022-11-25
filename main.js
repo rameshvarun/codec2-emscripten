@@ -110,43 +110,74 @@ function audioFileToRaw(buffer, filename) {
   });
 }
 
-const DEFAULT_VALUE = `74e98150e1854230e1c081f07214012072094160e1c541f04629ed4051fb
-f110c160a930c149e950043f7d90c58f7db04e5ebda07e23397044c658b0
-2b8a60c02dce60d04072d8c018bf28f09092f100b1a4801037ea008084bb
-dc007890a010a302bd80161b7540705e841090568400597f8110a6ad14a0
-e1b04000e1c741104629e9304650a510c3da80c03a4cc0d02bd4f5402db3
-ad306dae8540fca8410001b940d0cdf7d800d9082000b9e57160255abd50
-2f197d30843ef9101ff7e000dd85a4005f1f0000c8de88609a82c000dc86
-00007b2318a08c555ce08c0dd4908c0dd0406badd010785d8c005f291000
-bb49dc00bb5e18004875c000abf90120e1ff812093f60210723f4190e1c3
-8000e1b0c170e1f102d0fad74120721a8170eea9c240abb78180e1ff8310`;
+const DEFAULT_VALUE =
+  "74e98150e1854230e1c081f07214012072094160e1c541f04629ed4051fb" +
+  "f110c160a930c149e950043f7d90c58f7db04e5ebda07e23397044c658b0" +
+  "2b8a60c02dce60d04072d8c018bf28f09092f100b1a4801037ea008084bb" +
+  "dc007890a010a302bd80161b7540705e841090568400597f8110a6ad14a0" +
+  "e1b04000e1c741104629e9304650a510c3da80c03a4cc0d02bd4f5402db3" +
+  "ad306dae8540fca8410001b940d0cdf7d800d9082000b9e57160255abd50" +
+  "2f197d30843ef9101ff7e000dd85a4005f1f0000c8de88609a82c000dc86" +
+  "00007b2318a08c555ce08c0dd4908c0dd0406badd010785d8c005f291000" +
+  "bb49dc00bb5e18004875c000abf90120e1ff812093f60210723f4190e1c3" +
+  "8000e1b0c170e1f102d0fad74120721a8170eea9c240abb78180e1ff8310";
 
 class Decoder extends React.Component {
   render() {
     return html`<div>
-      <div>
+      <div className="form-group">
+        <label htmlFor="decode-hex-input">Hex Input</label>
         <textarea
+          className="form-control"
           style=${{ width: "100%", height: "300px" }}
           defaultValue=${DEFAULT_VALUE}
           id="decode-hex-input"
         >
         </textarea>
       </div>
-      <select defaultValue="700C" id="decode-mode-select">
-        <option value="3200">3200</option>
-        <option value="2400">2400</option>
-        <option value="1600">1600</option>
-        <option value="1400">1400</option>
-        <option value="1300">1300</option>
-        <option value="1200">1200</option>
-        <option value="700C">700C</option>
-        <option value="450">450</option>
-        <option value="450PWB">450PWB</option>
-      </select>
+      <div style=${{ marginTop: "20px" }} className="form-group row">
+        <label htmlFor="decode-mode-select" className="col-sm-3 col-form-label"
+          >Codec Mode</label
+        >
+        <div className="col-sm-9">
+          <select
+            defaultValue="700C"
+            id="decode-mode-select"
+            className="form-control"
+          >
+            <option value="3200">3200</option>
+            <option value="2400">2400</option>
+            <option value="1600">1600</option>
+            <option value="1400">1400</option>
+            <option value="1300">1300</option>
+            <option value="1200">1200</option>
+            <option value="700C">700C</option>
+            <option value="450">450</option>
+            <option value="450PWB">450PWB</option>
+          </select>
+        </div>
+      </div>
 
-      <button onClick=${() => this.decode()}>Decode</button>
-
-      <div><audio id="decode-playback" controls></audio></div>
+      <div
+        style=${{
+          marginTop: "20px",
+          marginBottom: "20px",
+          display: "flex",
+          justifyContent: "right",
+        }}
+      >
+        <button
+          type="submit"
+          className="btn btn-primary"
+          onClick=${() => this.decode()}
+        >
+          Decode
+        </button>
+      </div>
+      <hr />
+      <div style=${{ marginTop: "20px" }}>
+        <audio style=${{ width: "100%" }} id="decode-playback" controls></audio>
+      </div>
     </div>`;
   }
 

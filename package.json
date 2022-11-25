@@ -4,7 +4,7 @@
     "serve": "^14.1.2"
   },
   "scripts": {
-    "format": "prettier -w dist/index.html dist/main.js",
+    "format": "prettier -w index.html main.js",
     "start": "serve ."
   }
 }
